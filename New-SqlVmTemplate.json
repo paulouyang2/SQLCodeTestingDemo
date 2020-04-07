@@ -1,0 +1,335 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "westus2"
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "default"
+        },
+        "virtualNetworkId": {
+            "type": "string",
+            "defaultValue": "TestVNET"
+        },
+        "publicIpAddressType": {
+            "type": "string",
+            "defaultValue": "Dynamic"
+        },
+        "publicIpAddressSku": {
+            "type": "string",
+            "defaultValue": "Basic"
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "Premium_LRS"
+        },
+        "dataDisks": {
+            "type": "array",
+            "defaultValue": [{"lun":0,"createOption":"empty","caching":"ReadOnly","writeAcceleratorEnabled":false,"id":null,"name":null,"storageAccountType":"Premium_LRS","diskSizeGB":1023}]
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2ms"
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "azauto"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "diagnosticsStorageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS"
+        },
+        "diagnosticsStorageAccountKind": {
+            "type": "string",
+            "defaultValue": "Storage"
+        },
+        "sqlVirtualMachineLocation": {
+            "type": "string",
+            "defaultValue": "westus2"
+        },
+        "sqlConnectivityType": {
+            "type": "string",
+            "defaultValue": "Public"
+        },
+        "sqlPortNumber": {
+            "type": "int",
+            "defaultValue": 1433
+        },
+        "sqlStorageWorkloadType": {
+            "type": "string",
+            "defaultValue": "General"
+        },
+        "sqlStorageDisksConfigurationType": {
+            "type": "string",
+            "defaultValue": "NEW"
+        },
+        "sqlAutopatchingDayOfWeek": {
+            "type": "string",
+            "defaultValue": "Sunday"
+        },
+        "sqlAutopatchingStartHour": {
+            "type": "string",
+            "defaultValue": "2"
+        },
+        "sqlAutopatchingWindowDuration": {
+            "type": "string",
+            "defaultValue": "60"
+        },
+        "sqlAuthenticationLogin": {
+            "type": "string",
+            "defaultValue": "azauto"
+        },
+        "sqlAuthenticationPassword": {
+            "type": "securestring"
+        },
+        "dataPath": {
+            "type": "string",
+            "defaultValue": "F:\\data"
+        },
+        "dataDisksLUNs": {
+            "type": "array",
+            "defaultValue": [0]
+        },
+        "logPath": {
+            "type": "string",
+            "defaultValue": "F:\\log"
+        },
+        "logDisksLUNs": {
+            "type": "array",
+            "defaultValue": [0]
+        },
+        "tempDbPath": {
+            "type": "string",
+            "defaultValue": "F:\\tempDb"
+        },
+        "tempDisksLUNs": {
+            "type": "array",
+            "defaultValue": [0]
+        },
+        "rServicesEnabled": {
+            "type": "string",
+            "defaultValue": "false"
+        },
+        "images": {
+            "type": "array",
+            "defaultValue": [{"Version":"13.2.191101","Offer":"SQL2016SP2-WS2016","Skus":"enterprise","Name":"sql-wu2-test0"},{"Version":"14.1.191008","Offer":"SQL2017-WS2016","Skus":"enterprise","Name":"sql-wu2-test1"}]
+        }
+    },
+    "variables": {
+        "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkId'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('images')[copyIndex()].Name, '-nic')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIpAddresses/', concat(parameters('images')[copyIndex()].Name, '-ip'))]"
+            ],
+            "tags": {
+                "Project": "sqlCodeTest"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('images')[copyIndex()].Name, '-ip'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "copyNic",
+                "count": "[length(parameters('images'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[concat(parameters('images')[copyIndex()].Name, '-ip')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "Project": "sqlCodeTest"
+            },
+            "sku": {
+                "name": "[parameters('publicIpAddressSku')]"
+            },
+            "properties": {
+                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+            },
+            "copy": {
+                "name": "copyIp",
+                "count": "[length(parameters('images'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-07-01",
+            "name": "[concat(replace(parameters('images')[copyIndex()].Name,'-',''),'diag')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "Project": "sqlCodeTest"
+            },
+            "sku": {
+                "name": "[parameters('diagnosticsStorageAccountType')]"
+            },
+            "kind": "[parameters('diagnosticsStorageAccountKind')]",
+            "properties": {},
+            "copy": {
+                "name": "copySa",
+                "count": "[length(parameters('images'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('images')[copyIndex()].Name]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', concat(parameters('images')[copyIndex()].Name, '-nic'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', concat(replace(parameters('images')[copyIndex()].Name,'-',''),'diag'))]"
+            ],
+            "tags": {
+                "Project": "sqlCodeTest"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftSQLServer",
+                        "offer": "[parameters('images')[copyIndex()].Offer]",
+                        "sku": "[parameters('images')[copyIndex()].Skus]",
+                        "version": "[parameters('images')[copyIndex()].Version]"
+                    },
+                    "copy": [
+                        {
+                            "name": "dataDisks",
+                            "count": "[length(parameters('dataDisks'))]",
+                            "input": {
+                                "lun": "[parameters('dataDisks')[copyIndex('dataDisks')].lun]",
+                                "createOption": "[parameters('dataDisks')[copyIndex('dataDisks')].createOption]",
+                                "caching": "[parameters('dataDisks')[copyIndex('dataDisks')].caching]",
+                                "writeAcceleratorEnabled": "[parameters('dataDisks')[copyIndex('dataDisks')].writeAcceleratorEnabled]",
+                                "diskSizeGB": "[parameters('dataDisks')[copyIndex('dataDisks')].diskSizeGB]",
+                                "managedDisk": {
+                                    "id": "[coalesce(parameters('dataDisks')[copyIndex('dataDisks')].id, if(equals(parameters('dataDisks')[copyIndex('dataDisks')].name, json('null')), json('null'), resourceId('Microsoft.Compute/disks', parameters('dataDisks')[copyIndex('dataDisks')].name)))]",
+                                    "storageAccountType": "[parameters('dataDisks')[copyIndex('dataDisks')].storageAccountType]"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('images')[copyIndex()].Name, '-nic'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('images')[copyIndex()].Name]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true
+                    }
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://', concat(replace(parameters('images')[copyIndex()].Name,'-',''),'diag'), '.blob.core.windows.net/')]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "copyVm",
+                "count": "[length(parameters('images'))]"
+            }
+        },
+        {
+            "type": "Microsoft.SqlVirtualMachine/SqlVirtualMachines",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[parameters('images')[copyIndex()].Name]",
+            "location": "[parameters('sqlVirtualMachineLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('images')[copyIndex()].Name)]"
+            ],
+            "properties": {
+                "virtualMachineResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('images')[copyIndex()].Name)]",
+                "sqlManagement": "Full",
+                "SqlServerLicenseType": "PAYG",
+                "AutoPatchingSettings": {
+                    "Enable": true,
+                    "DayOfWeek": "[parameters('sqlAutopatchingDayOfWeek')]",
+                    "MaintenanceWindowStartingHour": "[parameters('sqlAutopatchingStartHour')]",
+                    "MaintenanceWindowDuration": "[parameters('sqlAutopatchingWindowDuration')]"
+                },
+                "KeyVaultCredentialSettings": {
+                    "Enable": false,
+                    "CredentialName": ""
+                },
+                "StorageConfigurationSettings": {
+                    "DiskConfigurationType": "[parameters('sqlStorageDisksConfigurationType')]",
+                    "StorageWorkloadType": "[parameters('sqlStorageWorkloadType')]",
+                    "SQLDataSettings": {
+                        "LUNs": "[parameters('dataDisksLUNs')]",
+                        "DefaultFilePath": "[parameters('dataPath')]"
+                    },
+                    "SQLLogSettings": {
+                        "LUNs": "[parameters('logDisksLUNs')]",
+                        "DefaultFilePath": "[parameters('logPath')]"
+                    },
+                    "SQLTempDbSettings": {
+                        "DefaultFilePath": "[parameters('tempDbPath')]",
+                        "LUNs": "[parameters('tempDisksLUNs')]"
+                    }
+                },
+                "ServerConfigurationsManagementSettings": {
+                    "SQLConnectivityUpdateSettings": {
+                        "ConnectivityType": "[parameters('sqlConnectivityType')]",
+                        "Port": "[parameters('sqlPortNumber')]",
+                        "SQLAuthUpdateUserName": "[parameters('sqlAuthenticationLogin')]",
+                        "SQLAuthUpdatePassword": "[parameters('sqlAuthenticationPassword')]"
+                    },
+                    "AdditionalFeaturesServerConfigurations": {
+                        "IsRServicesEnabled": "[parameters('rServicesEnabled')]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "copySqlVm",
+                "count": "[length(parameters('images'))]"
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}
