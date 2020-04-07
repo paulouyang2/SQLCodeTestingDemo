@@ -1,0 +1,59 @@
+
+trigger: none
+
+
+
+jobs:
+- job: default
+  timeoutInMinutes: 60
+  cancelTimeoutInMinutes: 30
+  pool:
+    vmImage: 'vs2017-win2016'
+  variables:
+    imageOffer: '[{"Offer":"SQL2016SP2-WS2016"}]'
+
+  steps:
+  - task: AzurePowerShell@5
+    displayName: 'Install SQL VMs'
+    inputs:
+      azureSubscription: 'SQLCodeTesting'
+      scriptType: 'FilePath'
+      scriptPath: 'Install-SqlVm.ps1'
+      azurePowerShellVersion: 'latestVersion'
+
+  - task: AzurePowerShell@5
+    displayName: 'Install SQL Code'
+    inputs:
+      azureSubscription: 'SQLCodeTesting'
+      scriptType: 'filePath' 
+      scriptPath: 'Install-SqlCode.ps1' 
+      scriptArguments: "'$(imageOffer)'"
+      azurePowerShellVersion: 'latestVersion'
+
+  - task: AzurePowerShell@5
+    displayName: 'Test SQL Code'
+    inputs:
+      azureSubscription: 'SQLCodeTesting'
+      scriptType: 'filePath' 
+      scriptPath: 'Test-SqlCode.ps1' 
+      scriptArguments: "$(Build.StagingDirectory) '$(imageOffer)'"
+      azurePowerShellVersion: 'latestVersion'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results'
+    inputs:
+      searchFolder: '$(Build.StagingDirectory)'
+      testResultsFormat: 'NUnit'
+      testResultsFiles: 'Test-SqlCodePester.XML'
+      testRunTitle: 'SQL Standard Object Unit Test'
+      failTaskOnFailedTests: true
+
+  - task: AzurePowerShell@5
+    displayName: 'Uninstall SQL VMs'
+    inputs:
+      azureSubscription: 'SQLCodeTesting'
+      scriptType: 'FilePath'
+      scriptPath: 'Uninstall-SqlVm.ps1'
+      azurePowerShellVersion: 'latestVersion'
+    condition: succeededOrFailed()
+
