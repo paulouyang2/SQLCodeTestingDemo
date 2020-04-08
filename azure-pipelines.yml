@@ -16,7 +16,7 @@ jobs:
   - task: AzurePowerShell@5
     displayName: 'Install SQL VMs'
     inputs:
-      azureSubscription: 'SQLCodeTesting'
+      azureSubscription: 'SQLCodeTestingDemo'
       scriptType: 'FilePath'
       scriptPath: 'Install-SqlVm.ps1'
       azurePowerShellVersion: 'latestVersion'
@@ -24,7 +24,7 @@ jobs:
   - task: AzurePowerShell@5
     displayName: 'Install SQL Code'
     inputs:
-      azureSubscription: 'SQLCodeTesting'
+      azureSubscription: 'SQLCodeTestingDemo'
       scriptType: 'filePath' 
       scriptPath: 'Install-SqlCode.ps1' 
       scriptArguments: "'$(imageOffer)'"
@@ -33,7 +33,7 @@ jobs:
   - task: AzurePowerShell@5
     displayName: 'Test SQL Code'
     inputs:
-      azureSubscription: 'SQLCodeTesting'
+      azureSubscription: 'SQLCodeTestingDemo'
       scriptType: 'filePath' 
       scriptPath: 'Test-SqlCode.ps1' 
       scriptArguments: "$(Build.StagingDirectory) '$(imageOffer)'"
@@ -51,7 +51,7 @@ jobs:
   - task: AzurePowerShell@5
     displayName: 'Uninstall SQL VMs'
     inputs:
-      azureSubscription: 'SQLCodeTesting'
+      azureSubscription: 'SQLCodeTestingDemo'
       scriptType: 'FilePath'
       scriptPath: 'Uninstall-SqlVm.ps1'
       azurePowerShellVersion: 'latestVersion'

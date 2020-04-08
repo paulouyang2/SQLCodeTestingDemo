@@ -120,7 +120,7 @@ $procs = .\ProcHashTable.ps1
 # get credential from vault
 
 $azAutoAccount = 'azauto'
-$azAutoSecret = Get-AzKeyVaultSecret -vaultName "SqlCodeTesting" -name "SQLVMAdmin"
+$azAutoSecret = Get-AzKeyVaultSecret -vaultName "SqlCodeTestingDemo" -name "SQLVMAdmin"
 $azAutoSecure = $azAutoSecret.SecretValue
 $azAutoCredential = New-Object System.Management.Automation.PSCredential $azAutoAccount, $azAutoSecure
 
