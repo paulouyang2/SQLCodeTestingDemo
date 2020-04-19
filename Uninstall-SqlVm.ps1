@@ -4,12 +4,7 @@
 
 .DESCRIPTION
     Remove SQL VMs and it dependencies (disks, networkInterfaces, storageAccounts)
-    
-.NOTES
-    Author: Paul Ou Yang
-    Date: 11/13/2019
-    Version: 1.0.0
-
+ 
 .EXAMPLE
     Remove-SqlVm.ps1 
 

@@ -14,11 +14,6 @@
     queryStateAfter
     expectedStateAfter
 
-.NOTES
-    Author: paulouyang
-    Date: 01/03/2019
-    Version: 3.0.0
-
 .PARAMETER ImageOffer 
     string of image metadata
     [{"VersionString":"Microsoft SQL Server 2012 (SP4-GDR)","Offer":"SQL2012SP4-WS2012R2","IPAddress":"51.141.188.120","Version":"11.1.200114","Skus":"Enterprise","Name":"sql-wu2-test0"}]
@@ -117,10 +112,13 @@ function Test-Procedure {
 $images = $ImageOffer | ConvertFrom-Json 
 $procs = .\ProcHashTable.ps1
 
+$vaultName = "SqlCodeTestingDemo" 
+$vaultSecret = "SQLVMAdmin"
+$azAutoAccount = 'azauto'
+
 # get credential from vault
 
-$azAutoAccount = 'azauto'
-$azAutoSecret = Get-AzKeyVaultSecret -vaultName "SqlCodeTestingDemo" -name "SQLVMAdmin"
+\$azAutoSecret = Get-AzKeyVaultSecret -vaultName $vaultName -name $vaultSecret
 $azAutoSecure = $azAutoSecret.SecretValue
 $azAutoCredential = New-Object System.Management.Automation.PSCredential $azAutoAccount, $azAutoSecure
 

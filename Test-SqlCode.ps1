@@ -5,11 +5,6 @@
 .DESCRIPTION
     Calls Invoke-Pester and output to XML file to pass to publish result task in Azure DevOps
 
-.NOTES
-    Author: paulouyang
-    Date: 01/03/2019
-    Version: 3.0.0
-
 .PARAMETER StagingPath 
     path for output file
 

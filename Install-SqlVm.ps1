@@ -6,16 +6,7 @@
     Get the images offered of the latest version of each major release and pass it as an array parameter to the ARM template
     The ARM template will install the resources needed for each element of the of the images array
     Get the IP Addresses and version string 
-    
-.NOTES
-    If runnnig from DevOps use Service Principal to connect to Azure
-    If running from PC use Connect-AzAccount 
-    ARM Parameter files store plain text, functions don't expand
-
-    Author: Paul Ou Yang
-    Date: 11/13/2019
-    Version: 1.0.0
-
+ 
 .EXAMPLE
     Install-SqlVm.ps1 
 
@@ -32,11 +23,13 @@ $publisher = 'MicrosoftSQLServer'
 $sku = 'Enterprise'
 $offerRegEx = '^SQL20[1-2][0-9].*-WS.*(?<!-byol)$'
 $prefix = 'sql-wu2-test'
+$vaultName = "SqlCodeTestingDemo" 
+$vaultSecret = "SQLVMAdmin"
+$azAutoAccount = 'azauto'
 
 # get credential from key vault
 
-$azAutoAccount = 'azauto'
-$azAutoSecret = Get-AzKeyVaultSecret -vaultName "SqlCodeTestingDemo" -name "SQLVMAdmin"
+$azAutoSecret = Get-AzKeyVaultSecret -vaultName $vaultName -name $vaultSecret
 $azAutoSecure = $azAutoSecret.SecretValue
 $azAutoCredential = New-Object System.Management.Automation.PSCredential $azAutoAccount, $azAutoSecure
 
