@@ -100,7 +100,7 @@ function Test-Procedure {
             }
         }
         if ($null -ne $expectedStateAfter) {
-            it 'State Before' { 
+            it 'State After' { 
                 $after[0].ItemArray | Should -Be $expectedStateAfter
             }
         }
