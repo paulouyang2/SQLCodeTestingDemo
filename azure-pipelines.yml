@@ -1,7 +1,7 @@
-# trigger: none
+trigger: none
 
-trigger: 
-- master
+# trigger: 
+# - master
 
 # schedules:
 # - cron: "0 17 * * 6"

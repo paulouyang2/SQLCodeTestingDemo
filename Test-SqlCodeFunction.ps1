@@ -1,3 +1,7 @@
+# For more details
+# Testing SQL Code with Pester chapter of the PowerShell Conference Book 
+# https://leanpub.com/psconfbook3
+
 function Test-SqlCode {
     [CmdletBinding()]
     param (
