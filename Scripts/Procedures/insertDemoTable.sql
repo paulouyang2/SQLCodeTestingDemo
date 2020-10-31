@@ -5,10 +5,13 @@ CREATE PROC insertDemoTable(
 )
 AS
 
+INSERT demoTable
+VALUES (@nameList)
+
 -- this will fail 
 
-INSERT demoTable
-SELECT value FROM STRING_SPLIT(@nameList, ',');
+-- INSERT demoTable
+-- SELECT value FROM STRING_SPLIT(@nameList, ',');
 
 -- the fix
 
@@ -18,4 +21,4 @@ SELECT value FROM STRING_SPLIT(@nameList, ',');
 -- ELSE
 --     INSERT demoTable
 --     SELECT value FROM dbo.SplitString(@nameList, ',');
-GO
+-- GO
