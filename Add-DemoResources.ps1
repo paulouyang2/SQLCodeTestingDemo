@@ -1,7 +1,6 @@
 <#
 .SYNOPSIS
     Adds the resources needed required the Automated SQL Code Testing CI Pipeline
-
 .DESCRIPTION
     Adds the following resources
         resource group
@@ -10,7 +9,6 @@
         service principal
         key vault
         devops project
-
 #>
 
 $subscriptionName = 'your subscription name'
@@ -24,6 +22,7 @@ $rule = 'AllowSQL'
 $vaultName = 'SqlCodeTestingDemo'
 $servicePrincipalName = 'http://SQLCodeTestingDemo'
 $projectName = "SqlCodeTestingDemo"
+$organization = 'https://dev.azure.com/pouyang/'
 
 # execute one command at a time 
 
@@ -110,11 +109,16 @@ az keyvault set-policy `
 
 az devops login
 
+# set organization
+
+az devops configure `
+    --defaults organization=$organization
+
 # create project
 
 az devops project create `
     --name $projectName
-
+    
 # run $servicePrincipal.password and copy it to the clipboard
 
 $servicePrincipal.Password
@@ -157,4 +161,3 @@ az pipelines create `
     --project $projectName `
     --skip-first-run `
     --yaml-path azure-pipelines.yml 
-
