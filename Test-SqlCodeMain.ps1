@@ -1,3 +1,4 @@
+# Pester 5.0.3 does not allow parameters, use a script variable instead
 # [CmdletBinding()]
 # param(
 #     [string]$ImageOffer 

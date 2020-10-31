@@ -23,6 +23,8 @@ param(
 
 Install-Module -Name Pester -Force -SkipPublisherCheck
 
+# by default the output is minimal
+# Invoke-Pester -Path '.\Test-SqlCodeMain.ps1' -Output 'Detailed'
 Invoke-Pester -Path '.\Test-SqlCodeMain.ps1' -OutputFile "$StagingPath\Test-SqlCodePester.XML" -OutputFormat 'NUnitXML'
 
 

@@ -2,7 +2,7 @@
     @{
         TestType     = 'proc'
         ObjectName   = 'insertDemoTable'
-        Query        = "insertDemoTable 'Mateo,Lucas,Pablo'"
+        Query        = "insertDemoTable 'Marcos'"
         ObjectExists = $true
         ErrorCheck   = $true
     },
