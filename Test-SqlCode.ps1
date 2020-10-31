@@ -23,14 +23,6 @@ param(
 
 Install-Module -Name Pester -Force -SkipPublisherCheck
 
-$param = @{
-    Script       = @{
-        Path       = ".\Test-SqlCodePester.ps1"
-        Parameters = @{
-            ImageOffer  = $ImageOffer
-        }
-    }
-    OutputFile   = "$StagingPath\Test-SqlCodePester.XML" 
-    OutputFormat = 'NUnitXML'
-}
-Invoke-Pester @param
+Invoke-Pester -Path '.\Test-SqlCodeMain.ps1' -OutputFile "$StagingPath\Test-SqlCodePester.XML" -OutputFormat 'NUnitXML'
+
+
