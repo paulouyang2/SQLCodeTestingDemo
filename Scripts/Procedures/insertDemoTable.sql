@@ -1,6 +1,6 @@
 USE demoDB
 GO
-CREATE PROC insertDemoTable(
+CREATE OR ALTER PROC insertDemoTable(
 @nameList varchar(1000)
 )
 AS
@@ -8,12 +8,17 @@ AS
 INSERT demoTable
 VALUES (@nameList)
 
--- this will fail 
+-- change 1
 
 -- INSERT demoTable
 -- SELECT value FROM STRING_SPLIT(@nameList, ',');
 
--- the fix
+
+
+
+
+
+-- change 2
 
 -- IF SERVERPROPERTY('ProductMajorVersion') > 11
 --     INSERT demoTable
