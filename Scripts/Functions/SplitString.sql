@@ -1,6 +1,6 @@
 USE demoDB
 GO
-CREATE FUNCTION dbo.SplitString
+CREATE OR ALTER FUNCTION dbo.SplitString
 (
     @List     nvarchar(max),
     @Delim    nvarchar(255)
