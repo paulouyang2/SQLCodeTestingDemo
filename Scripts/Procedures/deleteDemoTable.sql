@@ -1,6 +1,6 @@
 USE DemoDB
 GO
-CREATE OR ALTER PROC deleteDemoTable (
+CREATE PROC deleteDemoTable (
 @name varchar(50)
 )
 AS

@@ -1,6 +1,9 @@
 USE demoDB
 GO
-CREATE OR ALTER PROC insertDemoTable(
+IF OBJECT_ID('insertDemoTable') IS NOT NULL
+DROP PROC insertDemoTable
+GO
+CREATE PROC insertDemoTable(
 @nameList varchar(1000)
 )
 AS

@@ -1,6 +1,6 @@
 USE demoDB
 GO
-CREATE OR ALTER PROC updateDemoTable (
+CREATE PROC updateDemoTable (
 @oldName varchar(50), @newName varchar(50)
 )
 AS
