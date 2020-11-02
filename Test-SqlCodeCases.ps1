@@ -12,12 +12,5 @@
         Query        = "insertDemoTable 'Marcos'"
         ObjectExists = $true
         ErrorCheck   = $true
-    },
-    @{
-        TestType     = 'proc'
-        ObjectName   = 'updateDemotable'
-        Query        = "updateDemotable 'Pablo', 'Pedro'"
-        ObjectExists = $true
-        ErrorCheck   = $true
     }
 )
